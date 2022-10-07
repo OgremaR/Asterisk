@@ -1,0 +1,147 @@
+1) Установка текстового редактора vim/nano
+ 
+yum install vim 
+ 
+2) Настройка статического IP
+ 
+- Текстовым редактором открыть
+ 
+vim /etc/sysconfig/network-scripts/ifcfg-enp0s3
+ 
+- Заменить следующие строчки 
+ 
+BOOTPROTO="static"
+IPADDR= Ваш IP адрес
+GATEWAY= Ваш Default Gateway
+NETMASK= Маска подсети
+DNS1= Ваш Default Gateway
+DNS2= Опционально, например - 8.8.8.8
+NM_CONTROLLED=no
+ONBOOT=yes
+ 
+Сохранить :x
+ 
+ 
+3) Перезагрузка сетевого сервиса
+ 
+systemctl restart network.service
+ 
+6) Отключение Selinux
+ 
+vim /etc/sysconfig/selinux
+ 
+SELINUX =enforced заменить на SELINUX=disabled
+ 
+Сохранить :x
+ 
+7) Установка EPEL
+ 
+yum install epel-release
+yum update –y 
+reboot
+ 
+8) Установка необходимых пакетов
+ 
+yum install -y gcc gcc-c++ lynx bison mariadb-devel mariadb-server mariadb gmime-devel psmisc php php-mysql php-pear php-mbstring tftp-server httpd make ncurses-devel libtermcap-devel sendmail sendmail-cf caching-nameserver sox newt-devel libxml2-devel libtiff-devel audiofile-devel gtk2-devel subversion kernel-devel kernel-devel-$(uname -r) git subversion kernel-devel php-process crontabs cronie cronie-anacron wget  php-xml uuid-devel libtool sqlite-devel libuuid-devel bzip2 jansson-devel
+ 
+9) Установка DAHDI
+ 
+cd /usr/src/
+wget http://downloads.asterisk.org/pub/telephony/dahdi-linux-complete/dahdi-linux-complete-current.tar.gz
+tar xvfz dahdi-linux-complete-current.tar.gz 
+cd dahdi-linux-complete-* 
+make all 
+make install 
+make config 
+cd ..
+ 
+10) Установка libpri
+ 
+wget http://downloads.asterisk.org/pub/telephony/libpri/libpri-1.6.0.tar.gz
+tar xvfz libpri-1.6.0.tar.gz 
+cd libpri-1.6.0 
+make 
+make install 
+cd ..
+ 
+11) Установка PearDB
+ 
+pear install db-1.7.14
+ 
+12) Установка pjproject
+ 
+cd /usr/src/ 
+wget http://www.pjsip.org/release/2.4/pjproject-2.4.tar.bz2
+ tar -xjvf pjproject-2.4.tar.bz2 
+cd pjproject-2.4*
+ ./configure --prefix=/usr --enable-shared --disable-sound --disable-resample --disable-video --libdir=/usr/lib64 
+make dep
+ make 
+make install 
+cd ..
+ 
+13) Установка lame
+ 
+wget https://downloads.sourceforge.net/project/lame/lame/3.98.4/lame-3.98.4.tar.gz
+ tar zxvf lame-3.98.4.tar.gz 
+cd lame-3.98.4 
+./configure
+make 
+make install 
+cd ..
+ 
+14) Установка Asterisk
+ 
+wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-14-current.tar.gz
+tar xvfz asterisk-14-current.tar.gz
+cd asterisk-14* 
+./configure --libdir=/usr/lib64
+contrib/scripts/get_mp3_source.sh
+make menuselect
+ 
+14.1) В Menuselect
+- Вкладка Add-ons enable format_mp3
+- Вкладки Core Sound Packages, 
+  Music On Hold File Packages, 
+  Extras Sound Packages ------- отмечаем нужный набор форматов звуковых файлов
+ 
+Сохранить F12
+ 
+14.2) make
+ 
+make install 
+make samples 
+make config
+ 
+15) Создание пользователя и прав
+ 
+useradd -m asterisk
+chown asterisk.asterisk /var/run/asterisk 
+chown -R asterisk.asterisk /etc/asterisk 
+chown -R asterisk.asterisk /var/{lib,log,spool}/asterisk 
+chown -R asterisk.asterisk /usr/lib64/asterisk
+systemctl restart asterisk
+ 
+16) Подготовка БД
+ 
+systemctl enable mariadb.service
+systemctl start mariadb.service
+mysql -u root -p          Пароля по умолчанию нет,
+ 
+Создаем пользователя
+ 
+create user 'merionuser'@'localhost' identified by 'merionpass';
+Далее необходимо создать две базы данных для работы с Asterisk:
+create database asterisk;
+create database asteriskcdrdb;
+ 
+И даём все права доступа к этим базам пользователю, созданному ранее:
+GRANT ALL PRIVILEGES ON asterisk.* TO merionuser@localhost IDENTIFIED BY 'merionpass';
+GRANT ALL PRIVILEGES ON asteriskcdrdb.* TO merionuser@localhost IDENTIFIED BY 'merionpass'; 
+flush privileges;
+ 
+17) Пользуемся установленным Asterisk :)
+ 
+asterisk -rvv
+------------------------------------------------------
+# service asterisk start
