@@ -1,0 +1,43 @@
+Скачать C SIP simple
+ 
+cd /usr/local/etc/asterisk/sip_users.conf
+
+ 
+
+asterisk -r
+
+sip show peers – Отображение всех абонентов и транков SIP с указанием номера абонента, ip адреса, пинга и др.значений
+
+sip show registry – отображение всех SIP регистраций.
+
+sip reload – перезагружает модуль sip канала после внесения изменений в файл sip.conf
+
+sip show channels – отображение активных SIP каналов с указанием пользователя, идентификатора звонка и хоста пира.
+
+sip show settings – показывает глобальные настойки SIP
+
+sip set debug – режим отладки, применяется с значениями on/off  — отладка всей системы, ip – конкретный адрес, peer – абонент системы. К примеру «sip set debug peer 101»
+
+ 
+
+dialplan show – текущий диалплан
+
+dialplan reload – перезагрузка диалплана
+
+dialplan save – сохранить текущий диалплан в файл. Имеет зависимость от параметров writeprotect=no и static=yes в файле extensions.conf
+
+dialplan show globals – глобальные параметры диалплана
+
+ 
+
+core show codecs – отображение информации о установленных кодеках в Asterisk
+
+core restart gracefully – перезагрузка Asterisk после завершения всех разговоров.
+
+core restart now – немедленная перезагрузка Asterisk
+
+core show applications — Получить список приложений, загруженных в вашем сервере Asterisk. Эти приложения используются в плане набора (extensions.conf).
+
+core show help – доступные команды Asterisk CLI
+
+ 
